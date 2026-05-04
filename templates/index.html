@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LectureLens AI — Study Smarter</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #7c6fff;
+    --accent2: #ff6b9d;
+    --accent3: #6bffb8;
+    --text: #e8e8f0;
+    --text-dim: #8888aa;
+    --yellow: #ffd166;
+    --blue: #118ab2;
+    --green: #06d6a0;
+    --pink: #ef476f;
+    --purple: #9b5de5;
+    --glow: rgba(124, 111, 255, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(ellipse at 20% 20%, rgba(124, 111, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(255, 107, 157, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(107, 255, 184, 0.04) 0%, transparent 60%);
+    animation: bgShift 15s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes bgShift {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(-30px, -20px) rotate(1deg); }
+  }
+
+  .app-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    padding: 28px 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 20px rgba(124, 111, 255, 0.3);
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .lang-selector {
+    display: flex;
+    gap: 8px;
+    background: var(--surface);
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .lang-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--text-dim);
+  }
+
+  .lang-btn.active {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 12px rgba(124, 111, 255, 0.4);
+  }
+
+  /* ===== URL INPUT SECTION ===== */
+  .url-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 32px;
+    transition: border-color 0.3s;
+  }
+
+  .url-section:hover {
+    border-color: var(--accent);
+  }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .url-input-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .url-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    transition: all 0.3s;
+    outline: none;
+  }
+
+  .url-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124, 111, 255, 0.15);
+  }
+
+  .url-input::placeholder { color: var(--text-dim); }
+
+  .process-btn {
+    background: linear-gradient(135deg, var(--accent), #9b8fff);
+    border: none;
+    border-radius: 12px;
+    padding: 14px 28px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .process-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: 0.5s;
+  }
+
+  .process-btn:hover::after { left: 100%; }
+  .process-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(124, 111, 255, 0.4); }
+  .process-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ===== STATUS BAR ===== */
+  .status-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .status-bar.loading {
+    display: flex;
+    background: rgba(124, 111, 255, 0.1);
+    border: 1px solid rgba(124, 111, 255, 0.3);
+    color: var(--accent);
+  }
+
+  .status-bar.success {
+    display: flex;
+    background: rgba(107, 255, 184, 0.1);
+    border: 1px solid rgba(107, 255, 184, 0.3);
+    color: var(--accent3);
+  }
+
+  .status-bar.error {
+    display: flex;
+    background: rgba(239, 71, 111, 0.1);
+    border: 1px solid rgba(239, 71, 111, 0.3);
+    color: var(--pink);
+  }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(124, 111, 255, 0.3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== MAIN GRID ===== */
+  .main-grid {
+    display: none;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .main-grid.visible { display: grid; }
+
+  /* ===== TOOLS TABS ===== */
+  .tools-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .tabs-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .tab-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    box-shadow: 0 4px 15px rgba(124, 111, 255, 0.3);
+  }
+
+  /* ===== CONTENT PANELS ===== */
+  .content-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    min-height: 400px;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .content-panel.active { display: flex; }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .generate-btn {
+    background: linear-gradient(135deg, var(--accent2), #ff8fb8);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .generate-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .panel-content {
+    flex: 1;
+    overflow-y: auto;
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 14px;
+  }
+
+  .panel-content::-webkit-scrollbar { width: 4px; }
+  .panel-content::-webkit-scrollbar-track { background: var(--surface2); }
+  .panel-content::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 250px;
+    color: var(--text-dim);
+    gap: 12px;
+    text-align: center;
+  }
+
+  .empty-icon { font-size: 48px; opacity: 0.4; }
+
+  /* ===== SUMMARY CONTENT ===== */
+  .summary-text h1, .summary-text h2, .summary-text h3 {
+    font-family: 'Syne', sans-serif;
+    color: var(--accent);
+    margin: 16px 0 8px;
+  }
+  .summary-text h1 { font-size: 18px; }
+  .summary-text h2 { font-size: 16px; color: var(--accent2); }
+  .summary-text h3 { font-size: 14px; color: var(--accent3); }
+  .summary-text p { margin-bottom: 10px; }
+  .summary-text ul, .summary-text ol { padding-left: 20px; margin-bottom: 10px; }
+  .summary-text li { margin-bottom: 4px; }
+
+  /* ===== FLASHCARDS ===== */
+  .flashcards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .flashcard {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .flashcard:hover { border-color: var(--accent); transform: translateX(4px); }
+
+  .card-question {
+    padding: 14px 18px;
+    font-weight: 500;
+    color: var(--text);
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .card-q-badge {
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .card-answer {
+    display: none;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.6;
+    background: rgba(124, 111, 255, 0.05);
+  }
+
+  .flashcard.open .card-answer { display: block; }
+
+  .card-a-badge {
+    display: inline-block;
+    background: var(--accent3);
+    color: var(--bg);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* ===== STICKY NOTES ===== */
+  .notes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .sticky-note {
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    transition: transform 0.2s;
+  }
+
+  .sticky-note:hover { transform: rotate(-1deg) scale(1.02); }
+
+  .sticky-note.yellow { background: rgba(255, 209, 102, 0.15); border: 1px solid rgba(255, 209, 102, 0.3); }
+  .sticky-note.blue { background: rgba(17, 138, 178, 0.15); border: 1px solid rgba(17, 138, 178, 0.3); }
+  .sticky-note.green { background: rgba(6, 214, 160, 0.15); border: 1px solid rgba(6, 214, 160, 0.3); }
+  .sticky-note.pink { background: rgba(239, 71, 111, 0.15); border: 1px solid rgba(239, 71, 111, 0.3); }
+  .sticky-note.purple { background: rgba(155, 93, 229, 0.15); border: 1px solid rgba(155, 93, 229, 0.3); }
+
+  .note-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .note-content { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  /* ===== FLOWCHART ===== */
+  .flowchart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 16px;
+  }
+
+  .flow-node {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    max-width: 280px;
+    width: 100%;
+    transition: transform 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .flow-node:hover { transform: scale(1.03); }
+
+  .flow-node.start { background: linear-gradient(135deg, var(--accent3), #00c984); color: #0a0a0f; font-weight: 700; border-radius: 50px; }
+  .flow-node.end { background: linear-gradient(135deg, var(--accent2), #ff4785); color: white; font-weight: 700; border-radius: 50px; }
+  .flow-node.process { background: var(--surface2); border: 1px solid var(--accent); color: var(--text); }
+  .flow-node.decision { background: rgba(255, 209, 102, 0.15); border: 1px solid var(--yellow); color: var(--yellow); transform: rotate(0deg); border-radius: 4px; }
+
+  .flow-arrow {
+    width: 2px;
+    height: 24px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    position: relative;
+    margin: 0 auto;
+  }
+
+  .flow-arrow::after {
+    content: '▼';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent);
+    font-size: 10px;
+  }
+
+  /* ===== CHAT PANEL ===== */
+  .chat-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    position: sticky;
+    top: 24px;
+  }
+
+  .chat-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 8px var(--accent3);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .chat-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .chat-messages {
+    height: 380px;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  .msg {
+    max-width: 90%;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    animation: msgIn 0.3s ease;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--accent), #9b8fff);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .msg.ai {
+    align-self: flex-start;
+    background: var(--surface2);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .msg.ai.typing {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .typing-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    animation: typingBounce 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  .chat-input-row {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+  }
+
+  .chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: var(--text-dim); }
+
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    align-self: flex-end;
+  }
+
+  .send-btn:hover { background: #9b8fff; transform: scale(1.05); }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ===== VIDEO INFO ===== */
+  .video-info-bar {
+    display: none;
+    background: linear-gradient(135deg, rgba(124, 111, 255, 0.1), rgba(255, 107, 157, 0.05));
+    border: 1px solid rgba(124, 111, 255, 0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .video-info-bar.visible { display: flex; }
+
+  .video-thumb { font-size: 32px; }
+
+  .video-details h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .video-details p { font-size: 12px; color: var(--text-dim); }
+
+  /* ===== LOADING OVERLAY ===== */
+  .panel-loading {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    height: 200px;
+    color: var(--text-dim);
+  }
+
+  .panel-loading.visible { display: flex; }
+
+  .big-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid rgba(124, 111, 255, 0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .notes-grid { grid-template-columns: 1fr; }
+    .url-input-row { flex-direction: column; }
+    .chat-panel { position: relative; top: 0; }
+    .tabs-row { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px; }
+    .tab-btn { white-space: nowrap; font-size: 12px; padding: 8px 12px; }
+    .lang-selector { flex-wrap: wrap; gap: 4px; }
+    .lang-btn { font-size: 11px; padding: 4px 10px; }
+    .logo-text { font-size: 18px; }
+    header { flex-wrap: wrap; gap: 12px; }
+    .panel-header { flex-wrap: wrap; gap: 8px; }
+    .chat-messages { height: 280px; }
+    .url-input { font-size: 14px; }
+    .process-btn { width: 100%; }
+    .video-info-bar { flex-wrap: wrap; }
+    .generate-btn { font-size: 11px; padding: 6px 12px; }
+  }
+
+  @media (max-width: 480px) {
+    .app-container { padding: 0 12px; }
+    .url-section { padding: 20px 16px; }
+    .content-panel { padding: 16px; }
+    .logo-sub { display: none; }
+    .flow-node { max-width: 100%; font-size: 12px; }
+    .notes-grid { grid-template-columns: 1fr; }
+    .panel-title { font-size: 15px; }
+    .chat-messages { height: 240px; }
+    .video-thumb img { width: 80px !important; }
+    header { padding: 16px 0; }
+    .url-section { padding: 16px; margin-bottom: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🔬</div>
+      <div>
+        <div class="logo-text">LectureLens AI</div>
+        <div class="logo-sub">Study Smarter, Learn Deeper</div>
+      </div>
+    </div>
+    <div class="lang-selector">
+      <button class="lang-btn active" onclick="setLang('english', this)">English</button>
+      <button class="lang-btn" onclick="setLang('urdu', this)">اردو</button>
+      <button class="lang-btn" onclick="setLang('roman_urdu', this)">Roman Urdu</button>
+    </div>
+  </header>
+
+  <!-- URL INPUT -->
+  <div class="url-section">
+    <div class="section-label">📺 Step 1 — Enter YouTube Lecture URL</div>
+    <div class="url-input-row">
+      <input type="text" class="url-input" id="urlInput" 
+             placeholder="https://www.youtube.com/watch?v=..." 
+             onkeydown="if(event.key==='Enter') processVideo()">
+      <button class="process-btn" id="processBtn" onclick="processVideo()">
+        🚀 Analyze Video
+      </button>
+    </div>
+    <div class="status-bar" id="statusBar">
+      <div class="spinner" id="statusSpinner"></div>
+      <span id="statusText">Processing video...</span>
+    </div>
+  </div>
+
+  <!-- VIDEO INFO -->
+  <div class="video-info-bar" id="videoInfoBar">
+    <div class="video-thumb">
+    <img id="videoThumbnail" src="" style="width:120px; border-radius:8px;" />
+</div>
+    <div class="video-details">
+      <h3 id="videoTitle">Video Title</h3>
+      <p id="videoMeta">Transcript extracted and ready</p>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid" id="mainGrid">
+    <!-- LEFT: TOOLS -->
+    <div class="tools-panel">
+      <!-- TABS -->
+      <div class="tabs-row">
+        <button class="tab-btn active" onclick="showTab('summary', this)">📋 Summary</button>
+        <button class="tab-btn" onclick="showTab('flashcards', this)">🃏 Flashcards</button>
+        <button class="tab-btn" onclick="showTab('notes', this)">📌 Sticky Notes</button>
+        <button class="tab-btn" onclick="showTab('flowchart', this)">🔄 Flowchart</button>
+        <button class="tab-btn" onclick="showTab('transcript', this)">📜 Transcript</button>
+        <button class="tab-btn" onclick="showTab('quiz', this)">🧠 Quiz</button>
+        <button class="tab-btn" onclick="showTab('compare', this)">🔀 Compare</button>
+      </div>
+
+      <!-- SUMMARY PANEL -->
+      <div class="content-panel active" id="panel-summary">
+        <div class="panel-header">
+          <div class="panel-title">📋 Lecture Summary</div>
+          <button class="generate-btn" id="summaryBtn" onclick="generateSummary()">Generate ✨</button>
+          <button class="generate-btn" onclick="copyContent('summaryContent')" style="background: linear-gradient(135deg, #118ab2, #06d6a0);">📋 Copy</button>
+        </div>
+        <div class="panel-content" id="summaryContent">
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div>Click "Generate" to create a comprehensive summary of the lecture.</div>
+          </div>
+        </div>
+          <button class="generate-btn" id="exportBtn" 
+                onclick="exportPDF()" 
+                style="background: linear-gradient(135deg, #06d6a0, #00c984); margin-top: 10px;">
+            📄 Export PDF
+        </button>
+      </div>
+
+      <!-- FLASHCARDS PANEL -->
+      <div class="content-panel" id="panel-flashcards">
+        <div class="panel-header">
+          <div class="panel-title">🃏 Flashcards</div>
+          <button class="generate-btn" id="flashcardsBtn" onclick="generateFlashcards()">Generate ✨</button>
+          <button class="generate-btn" onclick="copyContent('flashcardsContent')" style="background: linear-gradient(135deg, #118ab2, #06d6a0);">📋 Copy</button>
+          <button class="generate-btn" onclick="exportSectionPDF('flashcardsContent')" style="background:linear-gradient(135deg, #06d6a0, #00c984);">📄 PDF</button>
+        </div>
+        <div class="panel-content" id="flashcardsContent">
+          <div class="empty-state">
+            <div class="empty-icon">🃏</div>
+            <div>Generate flashcards to test your knowledge. Click on a card to reveal the answer!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES PANEL -->
+      <div class="content-panel" id="panel-notes">
+        <div class="panel-header">
+          <div class="panel-title">📌 Sticky Notes</div>
+          <button class="generate-btn" id="notesBtn" onclick="generateNotes()">Generate ✨</button>
+          <button class="generate-btn" onclick="copyContent('notesContent')" style="background: linear-gradient(135deg, #118ab2, #06d6a0);">📋 Copy</button>
+          <button class="generate-btn" onclick="exportSectionPDF('notesContent')" style="background:linear-gradient(135deg, #06d6a0, #00c984);">📄 PDF</button>
+        </div>
+
+        <div class="panel-content" id="notesContent">
+          <div class="empty-state">
+            <div class="empty-icon">📌</div>
+            <div>Generate sticky notes with key points from the lecture.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLOWCHART PANEL -->
+      <div class="content-panel" id="panel-flowchart">
+        <div class="panel-header">
+          <div class="panel-title">🔄 Concept Flowchart</div>
+          <button class="generate-btn" id="flowchartBtn" onclick="generateFlowchart()">Generate ✨</button>
+          <button class="generate-btn" onclick="exportSectionPDF('flowchartContent')" style="background:linear-gradient(135deg, #06d6a0, #00c984);">📄 PDF</button>
+        </div>
+        <div class="panel-content" id="flowchartContent">
+          <div class="empty-state">
+            <div class="empty-icon">🔄</div>
+            <div>Generate a visual flowchart showing how concepts in the lecture connect.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- panel-transcript -->
+     <div class="content-panel" id="panel-transcript">
+    <div class="panel-header">
+        <div class="panel-title">📜 Full Transcript</div>
+        <button class="generate-btn" onclick="exportSectionPDF('transcriptContent')" style="background:linear-gradient(135deg, #06d6a0, #00c984);">📄 PDF</button>
+    </div>
+    <div class="panel-content" id="transcriptContent">
+        <div class="empty-state">
+            <div class="empty-icon">📜</div>
+            <div>Process a video to see transcript.</div>
+        </div>
+    </div>
+</div>
+<!--  quiz panel -->
+<div class="content-panel" id="panel-quiz">
+    <div class="panel-header">
+        <div class="panel-title">🧠 Quiz Mode</div>
+        <button class="generate-btn" onclick="generateQuiz()">Generate ✨</button>
+    </div>
+    <div class="panel-content" id="quizContent">
+        <div class="empty-state">
+            <div class="empty-icon">🧠</div>
+            <div>Generate a quiz to test your knowledge!</div>
+        </div>
+    </div>
+    <div id="quizScore" style="display:none; padding:12px; text-align:center; font-family:'Syne',sans-serif; font-size:18px; color:var(--accent3);"></div>
+</div>
+<!-- CAMPARE VEDIO -->
+<div class="content-panel" id="panel-compare">
+    <div class="panel-header">
+        <div class="panel-title">🔀 Compare Videos</div>
+        <button class="generate-btn" onclick="compareVideos()">Compare ✨</button>
+    </div>
+    <div style="padding:12px; display:flex; gap:8px;">
+        <input type="text" id="compareUrl" class="url-input" placeholder="Enter second YouTube URL...">
+    </div>
+    <div class="panel-content" id="compareContent">
+        <div class="empty-state">
+            <div class="empty-icon">🔀</div>
+            <div>Enter second video URL to compare!</div>
+        </div>
+    </div>
+</div>
+    <!-- RIGHT: CHAT -->
+    <div class="chat-panel">
+      <div class="chat-header">
+        <div class="chat-dot"></div>
+        <div class="chat-title">Ask LectureLens AI</div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg ai">
+          👋 Hi! I'm LectureLens AI. Process a YouTube lecture and then ask me anything about it. I'll answer based strictly on the video content!
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chatInput" rows="2"
+                  placeholder="Ask about the lecture..."
+                  onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendMessage(); }"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentSessionId = null;
+  let currentLanguage = 'english';
+
+  function setLang(lang, btn) {
+    currentLanguage = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function showStatus(type, message) {
+    const bar = document.getElementById('statusBar');
+    const text = document.getElementById('statusText');
+    const spinner = document.getElementById('statusSpinner');
+    bar.className = 'status-bar ' + type;
+    text.textContent = message;
+    spinner.style.display = type === 'loading' ? 'block' : 'none';
+    if (type !== 'loading') {
+      setTimeout(() => { bar.className = 'status-bar'; }, 4000);
+    }
+  }
+
+  async function processVideo() {
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) { showStatus('error', 'Please enter a YouTube URL'); return; }
+
+    const btn = document.getElementById('processBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Processing...';
+    showStatus('loading', 'Extracting transcript from YouTube...');
+
+    try {
+      const res = await fetch('/api/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        currentSessionId = data.session_id;
+        showStatus('success', `✅ Video processed! ${data.transcript_length} characters extracted.`);
+        
+        document.getElementById('videoTitle').textContent = data.title;
+      if (data.video_id) {
+    const thumbImg = document.getElementById('videoThumbnail');
+    thumbImg.style.display = 'block';
+    thumbImg.src = `https://i.ytimg.com/vi/${data.video_id}/mqdefault.jpg`;
+    thumbImg.onerror = () => { thumbImg.style.display = 'none'; };
+}
+        document.getElementById('videoMeta').textContent = 
+          `${data.transcript_length.toLocaleString()} characters · Session ready`;
+        document.getElementById('videoInfoBar').classList.add('visible');
+        document.getElementById('mainGrid').classList.add('visible');
+
+        addMessage('ai', `🎓 I've analyzed the lecture "${data.title}". You can now ask me questions, generate summaries, flashcards, sticky notes, or a flowchart!`);
+      if (data.transcript) {
+      document.getElementById('transcriptContent').innerHTML = 
+        `<div style="line-height:1.8; font-size:13px; color:var(--text); white-space:pre-wrap">${data.transcript}</div>`;
+}
+      
+      } else {
+        showStatus('error', data.error || 'Failed to process video');
+      }
+    } catch (e) {
+      showStatus('error', 'Network error. Please try again.');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🚀 Analyze Video';
+  }
+
+  function showTab(tab, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+  }
+
+  async function generateSummary() {
+    if (!currentSessionId) { alert('Please process a video first.'); return; }
+    const btn = document.getElementById('summaryBtn');
+    const content = document.getElementById('summaryContent');
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    content.innerHTML = '<div class="panel-loading visible"><div class="big-spinner"></div><div>Generating summary...</div></div>';
+
+    try {
+      const res = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: currentSessionId, language: currentLanguage })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const formatted = data.summary
+          .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+          .replace(/^## (.+)$/gm, '<h2>$2</h2>')
+          .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/^- (.+)$/gm, '<li>$1</li>')
+          .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
+          .replace(/\n\n/g, '</p><p>')
+          .replace(/\n/g, '<br>');
+        content.innerHTML = `<div class="summary-text"><p>${formatted}</p></div>`;
+      } else {
+        content.innerHTML = `<div class="empty-state"><div>❌ ${data.error}</div></div>`;
+      }
+    } catch (e) {
+      content.innerHTML = '<div class="empty-state"><div>❌ Network error</div></div>';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Generate ✨';
+  }
+
+  async function generateFlashcards() {
+    if (!currentSessionId) { alert('Please process a video first.'); return; }
+    const btn = document.getElementById('flashcardsBtn');
+    const content = document.getElementById('flashcardsContent');
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    content.innerHTML = '<div class="panel-loading visible"><div class="big-spinner"></div><div>Creating flashcards...</div></div>';
+
+    try {
+      const res = await fetch('/api/flashcards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: currentSessionId, language: currentLanguage })
+      });
+      const data = await res.json();
+      if (data.success && data.flashcards.length > 0) {
+        const html = data.flashcards.map((card, i) => `
+          <div class="flashcard" onclick="this.classList.toggle('open')">
+            <div class="card-question">
+              <span class="card-q-badge">Q${i+1}</span>
+              ${card.question}
+            </div>
+            <div class="card-answer">
+              <span class="card-a-badge">ANSWER</span><br>
+              ${card.answer}
+            </div>
+          </div>
+        `).join('');
+        content.innerHTML = `<div class="flashcards-grid">${html}</div>`;
+      } else {
+        content.innerHTML = `<div class="empty-state"><div>❌ ${data.error || 'Could not generate flashcards'}</div></div>`;
+      }
+    } catch (e) {
+      content.innerHTML = '<div class="empty-state"><div>❌ Network error</div></div>';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Generate ✨';
+  }
+
+  async function generateNotes() {
+    if (!currentSessionId) { alert('Please process a video first.'); return; }
+    const btn = document.getElementById('notesBtn');
+    const content = document.getElementById('notesContent');
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    content.innerHTML = '<div class="panel-loading visible"><div class="big-spinner"></div><div>Creating sticky notes...</div></div>';
+
+    try {
+      const res = await fetch('/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: currentSessionId, language: currentLanguage })
+      });
+      const data = await res.json();
+      if (data.success && data.notes.length > 0) {
+        const html = data.notes.map(note => `
+          <div class="sticky-note ${note.color || 'yellow'}">
+            <div class="note-title">${note.title}</div>
+            <div class="note-content">${note.content}</div>
+          </div>
+        `).join('');
+        content.innerHTML = `<div class="notes-grid">${html}</div>`;
+      } else {
+        content.innerHTML = `<div class="empty-state"><div>❌ ${data.error || 'Could not generate notes'}</div></div>`;
+      }
+    } catch (e) {
+      content.innerHTML = '<div class="empty-state"><div>❌ Network error</div></div>';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Generate ✨';
+  }
+
+  async function generateFlowchart() {
+    if (!currentSessionId) { alert('Please process a video first.'); return; }
+    const btn = document.getElementById('flowchartBtn');
+    const content = document.getElementById('flowchartContent');
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    content.innerHTML = '<div class="panel-loading visible"><div class="big-spinner"></div><div>Building flowchart...</div></div>';
+
+    try {
+      const res = await fetch('/api/flowchart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: currentSessionId, language: currentLanguage })
+      });
+      const data = await res.json();
+      if (data.success && data.flowchart.nodes) {
+        const fc = data.flowchart;
+        // Build adjacency for ordering
+        const nodeMap = {};
+        fc.nodes.forEach(n => nodeMap[n.id] = n);
+        
+        // Simple linear render (ordered by edges)
+        const visited = new Set();
+        const ordered = [];
+        const edgeMap = {};
+        fc.edges.forEach(e => { edgeMap[e.from] = e.to; });
+        
+        // Find start node
+        const targets = new Set(fc.edges.map(e => e.to));
+        let start = fc.nodes.find(n => !targets.has(n.id) || n.type === 'start');
+        if (!start) start = fc.nodes[0];
+        
+        let cur = start;
+        while (cur && !visited.has(cur.id)) {
+          ordered.push(cur);
+          visited.add(cur.id);
+          const nextId = edgeMap[cur.id];
+          cur = nextId ? nodeMap[nextId] : null;
+        }
+        // Add any remaining nodes
+        fc.nodes.forEach(n => { if (!visited.has(n.id)) ordered.push(n); });
+
+        const html = ordered.map((node, i) => `
+          <div class="flow-node ${node.type || 'process'}">${node.label}</div>
+          ${i < ordered.length - 1 ? '<div class="flow-arrow"></div>' : ''}
+        `).join('');
+        content.innerHTML = `<div class="flowchart-container">${html}</div>`;
+      } else {
+        content.innerHTML = `<div class="empty-state"><div>❌ ${data.error || 'Could not generate flowchart'}</div></div>`;
+      }
+    } catch (e) {
+      content.innerHTML = '<div class="empty-state"><div>❌ Network error</div></div>';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Generate ✨';
+  }
+  async function exportPDF() {
+    if (!currentSessionId) { alert('Please process a video first.'); return; }
+    
+    const summaryContent = document.getElementById('summaryContent').innerText;
+    if (!summaryContent || summaryContent.includes('Click "Generate"')) {
+        alert('Please generate a summary first!');
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/export', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: currentSessionId,
+                content: summaryContent,
+                title: document.getElementById('videoTitle').textContent
+            })
+        });
+
+        if (res.ok) {
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'lecturelens_export.pdf';
+            a.click();
+        }
+    } catch (e) {
+        alert('Export failed. Please try again.');
+    }
+}
+  function addMessage(role, text) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.textContent = text;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return div;
+  }
+
+  function addTypingIndicator() {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg ai typing';
+    div.id = 'typingIndicator';
+    div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+  function copyContent(elementId) {
+    const text = document.getElementById(elementId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('✅ Copied to clipboard!');
+    }).catch(() => {
+        alert('❌ Copy failed. Please try manually.');
+    });
+}
+
+
+async function exportSectionPDF(elementId) {
+    if (!currentSessionId) { alert('Please process a video first.'); return; }
+    const content = document.getElementById(elementId).innerText;
+    if (!content || content.includes('Generate')) {
+        alert('Please generate content first!');
+        return;
+    }
+    try {
+        const res = await fetch('/api/export', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: currentSessionId,
+                content: content,
+                title: document.getElementById('videoTitle').textContent
+            })
+        });
+        if (res.ok) {
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${elementId}_export.pdf`;
+            a.click();
+        }
+    } catch(e) {
+        alert('Export failed!');
+    }
+}
+
+let quizData = [];
+let currentQ = 0;
+let score = 0;
+
+async function generateQuiz() {
+    if (!currentSessionId) { alert('Please process a video first.'); return; }
+    const content = document.getElementById('quizContent');
+    content.innerHTML = '<div class="panel-loading visible"><div class="big-spinner"></div><div>Generating quiz...</div></div>';
+    
+    const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: currentSessionId, language: currentLanguage })
+    });
+    const data = await res.json();
+    
+    if (data.success && data.questions.length > 0) {
+        quizData = data.questions;
+        currentQ = 0;
+        score = 0;
+        document.getElementById('quizScore').style.display = 'none';
+        showQuestion();
+    }
+}
+
+function showQuestion() {
+    if (currentQ >= quizData.length) {
+        document.getElementById('quizContent').innerHTML = '';
+        document.getElementById('quizScore').style.display = 'block';
+        document.getElementById('quizScore').innerHTML = `🎉 Score: ${score}/${quizData.length}`;
+        return;
+    }
+    const q = quizData[currentQ];
+    const html = `
+        <div style="padding:16px;">
+            <div style="font-weight:600; margin-bottom:16px; color:var(--text)">Q${currentQ+1}: ${q.question}</div>
+            ${q.options.map(opt => `
+                <button onclick="checkAnswer('${opt[0]}', '${q.correct}')" 
+                    style="display:block; width:100%; text-align:left; padding:10px 16px; margin-bottom:8px;
+                    background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+                    color:var(--text); cursor:pointer; font-size:13px;">
+                    ${opt}
+                </button>`).join('')}
+        </div>`;
+    document.getElementById('quizContent').innerHTML = html;
+}
+
+function checkAnswer(selected, correct) {
+    if (selected === correct) score++;
+    currentQ++;
+    showQuestion();
+}
+  async function sendMessage() {
+    if (!currentSessionId) {
+      addMessage('ai', '⚠️ Please process a YouTube video first before asking questions.');
+      return;
+    }
+    const input = document.getElementById('chatInput');
+    const question = input.value.trim();
+    if (!question) return;
+
+    addMessage('user', question);
+    input.value = '';
+    addTypingIndicator();
+
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: currentSessionId,
+          question,
+          language: currentLanguage
+        })
+      });
+      const data = await res.json();
+      removeTypingIndicator();
+      addMessage('ai', data.answer || data.error || 'Sorry, I could not answer that.');
+    } catch (e) {
+      removeTypingIndicator();
+      addMessage('ai', '❌ Network error. Please try again.');
+    }
+    sendBtn.disabled = false;
+  }
+
+
+async function compareVideos() {
+    if (!currentSessionId) { alert('Please process a video first.'); return; }
+    const url2 = document.getElementById('compareUrl').value.trim();
+    if (!url2) { alert('Please enter second video URL!'); return; }
+
+    const content = document.getElementById('compareContent');
+    content.innerHTML = '<div class="panel-loading visible"><div class="big-spinner"></div><div>Comparing videos...</div></div>';
+
+    try {
+        const res = await fetch('/api/compare', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: currentSessionId,
+                url2: url2,
+                language: currentLanguage
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            content.innerHTML = `<div class="summary-text" style="padding:8px"><p>${data.comparison.replace(/\n/g, '<br>')}</p></div>`;
+        } else {
+            content.innerHTML = `<div class="empty-state"><div>❌ ${data.error}</div></div>`;
+        }
+    } catch(e) {
+        content.innerHTML = '<div class="empty-state"><div>❌ Network error</div></div>';
+    }
+}
+</script>
+</body>
+</html>
+ 
